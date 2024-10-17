@@ -1,0 +1,37 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index Page</title>
+    <link href="{% static 'plugins/bootstrap-3.4.1/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/common.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'plugins/font-awesome-4.7.0/css/font-awesome.min.css' %}">
+</head>
+<body>
+    <video autoplay loop muted class="wallpaper-video" poster="https://files.codelife.cc/itab/defaultWallpaper/videos/56.mp4?x-oss-process=video/snapshot,t_1,f_jpg,w_1366,h_768,m_fast"> 
+        <source src="https://files.codelife.cc/itab/defaultWallpaper/videos/56.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <div class="container">
+        <div class="text-wrapper">
+            <div class="text-line text-1">Welcome to PMS</div>
+            <div class="text-line text-2">It is designed by nis3368 team 10!</div>
+        </div>
+        <div class="row w-100">
+            <div class="col-6 text-right">
+                <a href="{% url 'login' %}" class="btn btn-index">Log in <i class="fa fa-arrow-right"></i></a>
+            </div>
+            <div class="col-6 text-left">
+                <a href="{% url 'register' %}" class="btn btn-index">Register <i class="fa fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-3.4.1/js/bootstrap.min.js' %}"></script>
+</body>
+</html>
