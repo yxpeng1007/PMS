@@ -1,20 +1,73 @@
 {% load static %}
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Register</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Page</title>
     <link href="{% static 'plugins/bootstrap-3.4.1/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/common.css' %}" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <h2>Register</h2>
-        <form method="post">
+    <video autoplay loop muted class="wallpaper-video" poster="https://files.codelife.cc/itab/defaultWallpaper/videos/56.mp4?x-oss-process=video/snapshot,t_1,f_jpg,w_1366,h_768,m_fast">
+        <source src="https://files.codelife.cc/itab/defaultWallpaper/videos/56.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <div class="register-container col-xs-12 col-sm-8 col-md-4 col-md-offset-4 col-lg-4 col-lg-offset-4">
+        <form class="form-horizontal" id="registrationForm" method="post">
             {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">Register</button>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" class="form-control" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="phone_number">Phone Number</label>
+                <input type="text" class="form-control" id="phone_number" name="phone_number" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password</label>
+                <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+            </div>
+            <div class="form-group text-center">
+                <button type="submit" class="btn btn-login highlight">Register</button>
+            </div>
+            <div class="form-group">
+                <p class="pull-right">Already have an account? <a href="{% url 'login' %}" class="body-text">Login here</a></p>
+            </div>
+            {% if error %}
+                <div class="alert alert-danger">{{ error }}</div>
+            {% endif %}
         </form>
-        <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
     </div>
+
+    <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-3.4.1/js/bootstrap.min.js' %}"></script>
+    <script>
+
+        document.getElementById('registrationForm').onsubmit = function(e) {
+            var username = document.getElementById('username').value;
+            var email = document.getElementById('email').value;
+            var phoneNumber = document.getElementById('phone_number').value;
+            var password = document.getElementById('password').value;
+            var confirmPassword = document.getElementById('confirm_password').value;
+
+            if (!username || !email || !phoneNumber || !password || !confirmPassword) {
+                alert('Please fill in all fields.');
+                e.preventDefault(); // Prevent form submission
+            } else if (password !== confirmPassword) {
+                alert('Password and confirm password do not match.');
+                e.preventDefault(); // Prevent form submission
+            }
+        };
+    </script>
 </body>
 </html>

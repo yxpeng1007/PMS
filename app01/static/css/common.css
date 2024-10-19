@@ -68,14 +68,17 @@ html {
 
 .login-container {
     position: relative;
-    /* 确保 .login-container 是相对定位 */
     background-color: rgba(255, 255, 255, 0.1);
     padding: 20px;
     border-radius: 5px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    margin: auto auto auto auto;
+    margin: auto;
     width: fit-content;
-    /* 根据内容自动调整宽度 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* 水平居中对齐子元素 */
 }
 
 /* 通用按钮样式 */
@@ -124,36 +127,57 @@ html {
 }
 
 /* 登录按钮样式 */
+
 .btn-login {
     width: 200px;
     color: #000;
-    border: 2px solid #f04949;
-    background-color: rgba(240, 73, 73, 0.2);
+    background-color: rgba(12, 132, 187, 0.2);
+    /* 初始半透明背景色 */
     opacity: 0.9;
+    /* 初始不透明度 */
+    text-align: center;
+    transition: background-color 0.3s, opacity 0.3s;
+    /* 平滑过渡背景色和不透明度 */
+    border: none;
+    /* 初始无边框 */
+    padding: 10px 20px;
+    /* 内边距 */
+    font-size: 18px;
+    /* 字体大小 */
+    font-weight: bold;
+    /* 字体加粗 */
+    cursor: pointer;
+    /* 鼠标悬停时显示指针 */
+    position: relative;
+    /* 相对定位 */
+    overflow: hidden;
+    /* 内容溢出隐藏 */
 }
 
 .btn-login:hover {
     transform: scale(1.1);
-    background-color: #5bc0de;
-    border-color: #5bc0de;
-    opacity: 1;
-    text-align: center;
-    /* 居中文本 */
+    /* 鼠标悬停时放大 */
+    background-color: rgba(91, 192, 222, 0.5);
+    /* 鼠标悬停时更深的蓝色，半透明 */
+    opacity: 0.9;
+    /* 鼠标悬停时保持不透明度 */
 }
 
 .btn-login i {
     position: absolute;
     top: 50%;
-    transform: translateY(-50%);
+    left: 50%;
+    transform: translate(-50%, -50%);
     transition: opacity 0.3s ease;
     opacity: 0;
     color: #ffffff;
-    right: 20px;
 }
 
 .btn-login:hover i {
-    opacity: 1;
+    opacity: 0.5;
+    /* 鼠标悬停时图标显示 */
 }
+
 
 .row {
     width: 100%;
@@ -196,15 +220,47 @@ html {
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(91, 192, 222, .6);
 }
 
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-control {
-    border-radius: 5px;
-}
-
 .error-message {
     color: red;
     text-align: center;
+}
+
+/* register */
+.register-container {
+    position: relative;
+    padding-top: 50px;
+    top: 50%;
+    background-color: rgba(255, 255, 255, 0.8);
+    border: none;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100%;
+    /* 或者您可以设置一个固定宽度 */
+    max-width: 400px;
+    /* 或者您希望的最大宽度 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    align-items: center;
+    /* 垂直居中 */
+    justify-content: center;
+    /* 水平居中 */
+    height: 100vh;
+    /* 视口高度 */
+}
+
+.alert-danger {
+    margin-top: 10px;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+    color: #a94442;
+}
+
+.bold-text {
+    font-weight: bold;
 }
