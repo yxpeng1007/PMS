@@ -228,30 +228,43 @@ html {
 /* register */
 .register-container {
     position: relative;
-    padding-top: 50px;
-    top: 50%;
-    background-color: rgba(255, 255, 255, 0.8);
-    border: none;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 20px;
     border-radius: 5px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    width: 100%;
-    /* 或者您可以设置一个固定宽度 */
-    max-width: 400px;
-    /* 或者您希望的最大宽度 */
+    margin: auto;
+    width: fit-content;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    align-items: center;
-    /* 垂直居中 */
-    justify-content: center;
-    /* 水平居中 */
-    height: 100vh;
-    /* 视口高度 */
+    /* 水平居中对齐子元素 */
+}
+
+.date-time-register {
+    position: absolute;
+    /* 相对于最近的相对定位的祖先元素定位 */
+    top: -10px;
+    /* 向上移动50像素 */
+    margin-left: auto;
+    margin-right: auto;
+    color: white;
+    background-color: rgba(255, 255, 255, 0.01);
+    /* 低透明度背景 */
+    padding: 10px;
+    font-size: 60px;
+    border-radius: 5px;
+    z-index: 1000;
+    font-weight: bold;
+    transition: border 0.3s;
+    /* 平滑过渡效果 */
+    border: 2px solid transparent;
+    /* 初始化边框为透明 */
+}
+
+.date-time-register:hover {
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    /* 鼠标悬停时的边框颜色 */
 }
 
 .alert-danger {
@@ -263,4 +276,9 @@ html {
 
 .bold-text {
     font-weight: bold;
+}
+
+.spaced-link {
+    margin-right: 50px;
+    /* 修改为你需要的间隔 */
 }
