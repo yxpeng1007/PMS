@@ -130,7 +130,7 @@ html {
 
 .btn-login {
     width: 200px;
-    color: #000;
+    color: #337ab7;
     background-color: rgba(12, 132, 187, 0.2);
     /* 初始半透明背景色 */
     opacity: 0.9;
@@ -161,6 +161,7 @@ html {
     /* 鼠标悬停时更深的蓝色，半透明 */
     opacity: 0.9;
     /* 鼠标悬停时保持不透明度 */
+    color: #337ab7;
 }
 
 .btn-login i {
@@ -281,4 +282,8 @@ html {
 .spaced-link {
     margin-right: 50px;
     /* 修改为你需要的间隔 */
+}
+
+.white-text {
+    color: white;
 }

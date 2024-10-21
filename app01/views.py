@@ -1,9 +1,12 @@
 from django.shortcuts import render, redirect
+from django.http import JsonResponse
 from django.contrib.auth import authenticate, login as django_login, get_user_model
+from django.views.decorators.http import require_http_methods
 from app01.forms.userForm import CustomUserCreationForm
-from app01.forms.passwardResetForm import PasswordResetForm
+from app01.forms.passwordResetForm import PasswordResetForm
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.models import User
+
+User = get_user_model()
 
 def login(request):
     if request.method == 'POST':
@@ -25,32 +28,12 @@ def login(request):
         form = AuthenticationForm()
         return render(request, 'login.html', {'form': form})
 
-# 注册页面的视图函数（需要实现）
 def register(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
-            password = form.cleaned_data['password1']
-            confirm_password = form.cleaned_data['password2']
-            if password != confirm_password:
-                form.add_error('password2', 'Password and confirm password do not match.')
-                return render(request, 'register.html', {'form': form, 'error': 'Password and confirm password do not match.'})
-
-            # Check if user already exists
-            if User.objects.filter(username=form.cleaned_data['username']).exists():
-                form.add_error('username', 'Username already exists.')
-                return render(request, 'register.html', {'form': form, 'error': 'Username already exists'})
-
-            if User.objects.filter(email=form.cleaned_data['email']).exists():
-                form.add_error('email', 'Email already exists.')
-                return render(request, 'register.html', {'form': form, 'error': 'Email already exists'})
-
-            if User.objects.filter(phone_number=form.cleaned_data['phone_number']).exists():
-                form.add_error('phone_number', 'Phone number already exists.')
-                return render(request, 'register.html', {'form': form, 'error': 'Phone number already exists'})
-
             user = form.save()
-            login(request, user)
+            django_login(request, user)
             return redirect('home')
         else:
             context = {'form': form, 'error': 'Invalid registration data'}
@@ -80,6 +63,20 @@ def forgot_password(request):
     else:
         form = PasswordResetForm()
         return render(request, 'forgot_password.html', {'form': form})
+    
+@require_http_methods(["POST"])
+def forgot_password_check(request):
+    username = request.POST.get('username')
+    email = request.POST.get('email')
+    user = User.objects.filter(username=username, email=email).first()
+    
+    if user:
+        return JsonResponse({'success': True})
+    else:
+        return JsonResponse({'success': False})
+
+def reset_password(request):
+    return render(request, 'reset_password.html')
 
 # 登录页面的视图函数
 def home(request):
