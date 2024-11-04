@@ -17,7 +17,8 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path
-
+from django.conf import settings
+from django.conf.urls.static import static
 from app01 import views
 
 urlpatterns = [
@@ -42,4 +43,11 @@ urlpatterns = [
         views.forgot_password_phone_check,
         name="forgot_password_phone_check",
     ),
+    path("add_course/", views.add_course, name="add_course"),
+    path("delete_course/", views.delete_course, name="delete_course"),
+    path("change_week/", views.change_week, name="change_week"),
+    path("information/", views.information, name="information"),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

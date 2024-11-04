@@ -1,0 +1,218 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(120deg, #f6d365 0%, #fda085 100%);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    height: 100vh;
+}
+
+.wallpaper-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    /* 视口宽度 */
+    height: 100vh;
+    /* 视口高度 */
+    object-fit: cover;
+    /* 视频内容按比例缩放并覆盖整个元素 */
+    z-index: -100;
+}
+
+.container {
+    width: 80%;
+    max-width: 900px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    box-sizing: border-box;
+    text-align: center;
+    margin: 30px 10px; /* 默认 margin */
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.profile-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.info-left {
+    width: 60%;
+    text-align: left;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.form-group p, .info-form input, .info-form textarea {
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 1rem;
+    color: #333;
+    word-wrap: break-word;
+    overflow: hidden;
+    width: 100%;
+}
+
+.avatar-section {
+    width: 30%;
+    text-align: right;
+}
+
+.avatar-section img {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.info-form {
+    text-align: left;
+}
+
+.info-form input, .info-form textarea {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    resize: vertical;
+    margin-bottom: 15px;
+}
+
+textarea {
+    height: auto;
+    min-height: 60px;
+}
+
+textarea:focus, input:focus {
+    border-color: #fda085;
+    outline: none;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 25px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.primary-btn {
+    background-color: #fda085;
+    color: white;
+}
+
+.primary-btn:hover {
+    background-color: #f6d365;
+}
+
+.danger-btn {
+    background-color: #ff6b6b;
+    color: white;
+    margin-left: 10px;
+}
+
+.danger-btn:hover {
+    background-color: #ff4757;
+}
+
+#avatar-preview {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    margin: 10px auto;
+}
+
+/* 编辑模式下容器的样式 */
+#edit-form.container {
+    margin-top: 200px;
+}
+
+@media (max-width: 600px) {
+    .profile-card {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .avatar-section {
+        margin-top: 20px;
+    }
+}
+
+/* 弹窗样式 */
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+}
+
+.modal-content {
+    text-align: center;
+}
+
+.modal-content p {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+.modal-content button {
+    padding: 10px 20px;
+    background-color: #fda085;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.modal-content button:hover {
+    background-color: #f6d365;
+}
+/* 继续沿用现有的 form-group 样式 */
+.form-group label {
+    display: block;
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.form-group p, .info-form input, .info-form textarea {
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 1rem;
+    color: #333;
+    word-wrap: break-word;
+    overflow: hidden;
+    width: 100%;
+}
+
+/* 其他CSS与之前相同，无需进一步更改 */

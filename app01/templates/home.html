@@ -1,5 +1,4 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,14 +6,759 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
     <link href="{% static 'plugins/bootstrap-3.4.1/css/bootstrap.min.css' %}" rel="stylesheet">
-    {% comment %} <link href="{% static 'css/login.css' %}" rel="stylesheet"> {% endcomment %}
-    <link href="{% static 'plugins/font-awesome-4.7.0/css/font-awesome.min.css' %}" rel="stylesheet">
     <link href="{% static 'css/common.css' %}" rel="stylesheet">
+    <style>
+        /*添加课程与删除课程按钮*/
+        .button-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+        /* 头像按钮的样式 */
+        #avatarBtn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
+
+        /* 模态窗口的样式 */
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 30%;
+            margin: 15% auto;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .close {
+            float: right;
+            cursor: pointer;
+            font-size: 1.5em;
+        }
+
+        #addCourseModal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+       /* 课程表的样式 */
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            table-layout: fixed;/*固定表格布局*/
+        }
+
+        .schedule-table th,
+        .schedule-table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+            width: 12.5%;
+            height: 50px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /*课程名*/
+        .course-name{
+            width: 95%;
+            white-space: nowrap;/*防换行*/
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+            color: #333333;
+        }
+        
+        /*浮窗*/
+        .toast {
+        visibility: hidden; /* 默认隐藏 */
+        min-width: 250px;
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        border-radius: 5px;
+        padding: 16px;
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1;
+        font-size: 17px;
+    }
+
+    .toast.show {
+        visibility: visible;
+        -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    }
+
+    @-webkit-keyframes fadein {
+        from { bottom: 0; opacity: 0; }
+        to { bottom: 30px; opacity: 1; }
+    }
+
+    @keyframes fadein {
+        from { bottom: 0; opacity: 0; }
+        to { bottom: 30px; opacity: 1; }
+    }
+
+    @-webkit-keyframes fadeout {
+        from { bottom: 30px; opacity: 1; }
+        to { bottom: 0; opacity: 0; }
+    }
+
+    @keyframes fadeout {
+        from { bottom: 30px; opacity: 1; }
+        to { bottom: 0; opacity: 0; }
+    }
+
+    </style>
 </head>
 <body>
-    <video autoplay loop muted class="wallpaper-video" poster="https://files.codelife.cc/itab/defaultWallpaper/videos/56.mp4?x-oss-process=video/snapshot,t_1,f_jpg,w_1366,h_768,m_fast"> 
+    <video autoplay loop muted class="wallpaper-video" poster="https://files.codelife.cc/itab/defaultWallpaper/videos/56.mp4?x-oss-process=video/snapshot,t_1,f_jpg,w_1366,h_768,m_fast">
         <source src="https://files.codelife.cc/itab/defaultWallpaper/videos/56.mp4" type="video/mp4">
         Your browser does not support the video tag.
     </video>
+
+    <div class="button-container">
+        <button id="avatarBtn" class="btn btn-secondary">头像</button>
+    </div>
+
+    <div class="button-container">
+        <button id="addCourseBtn">添加课程</button>
+        <button id="deleteCourseBtn" class="btn btn-danger">删除课程</button>
+    </div>
+
+    <h1>课程表</h1>
+
+    <!-- 课程表 -->
+    <table class="schedule-table">
+        <thead>
+            <tr>
+                <th></th>
+                {% for day in days %}
+                    <th>{{ day }}</th>
+                {% endfor %}
+            </tr>
+            <tr>
+                <th></th>
+                {% for date in dates %}
+                    <th>{{ date }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+    <tr>
+        <td>第 1 节</td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '1' and course.time_slot == '1' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '2' and course.time_slot == '1' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '3' and course.time_slot == '1' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '4' and course.time_slot == '1' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '5' and course.time_slot == '1' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '6' and course.time_slot == '1' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '7' and course.time_slot == '1' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+        </tr>
+        <tr>
+            <td>第 2 节</td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '1' and course.time_slot == '2' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '2' and course.time_slot == '2' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '3' and course.time_slot == '2' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '4' and course.time_slot == '2' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '5' and course.time_slot == '2' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '6' and course.time_slot == '2' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '7' and course.time_slot == '2' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+        </tr>
+        <tr>
+            <td>第 3 节</td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '1' and course.time_slot == '3' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '2' and course.time_slot == '3' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '3' and course.time_slot == '3' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '4' and course.time_slot == '3' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '5' and course.time_slot == '3' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '6' and course.time_slot == '3' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '7' and course.time_slot == '3' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+        </tr>
+        <tr>
+            <td>第 4 节</td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '1' and course.time_slot == '4' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '2' and course.time_slot == '4' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '3' and course.time_slot == '4' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '4' and course.time_slot == '4' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '5' and course.time_slot == '4' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '6' and course.time_slot == '4' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '7' and course.time_slot == '4' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+        </tr>
+        <tr>
+            <td>第 5 节</td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '1' and course.time_slot == '5' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '2' and course.time_slot == '5' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '3' and course.time_slot == '5' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '4' and course.time_slot == '5' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '5' and course.time_slot == '5' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '6' and course.time_slot == '5' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '7' and course.time_slot == '5' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+        </tr>
+        <tr>
+            <td>第 6 节</td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '1' and course.time_slot == '6' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '2' and course.time_slot == '6' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '3' and course.time_slot == '6' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '4' and course.time_slot == '6' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '5' and course.time_slot == '6' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '6' and course.time_slot == '6' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for course in courses %}
+                    {% if course.day_of_week == '7' and course.time_slot == '6' %}
+                        <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+        </tr>
+        <tr>
+            <td>额外任务</td>
+            <td>
+                <div>
+                    {% for course in courses %}
+                        {% if course.day_of_week == '1' and course.time_slot == '7' %}
+                            <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div>
+                    {% for course in courses %}
+                        {% if course.day_of_week == '1' and course.time_slot == '8' %}
+                            <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </td>
+            <td>
+                <div>
+                    {% for course in courses %}
+                        {% if course.day_of_week == '2' and course.time_slot == '7' %}
+                            <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div>
+                    {% for course in courses %}
+                        {% if course.day_of_week == '2' and course.time_slot == '8' %}
+                            <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </td>
+            <td>
+                <div>
+                    {% for course in courses %}
+                        {% if course.day_of_week == '3' and course.time_slot == '7' %}
+                            <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div>
+                    {% for course in courses %}
+                        {% if course.day_of_week == '3' and course.time_slot == '8' %}
+                            <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </td>
+            <td>
+                <div>
+                    {% for course in courses %}
+                        {% if course.day_of_week == '4' and course.time_slot == '7' %}
+                            <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div>
+                    {% for course in courses %}
+                        {% if course.day_of_week == '4' and course.time_slot == '8' %}
+                            <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </td>
+            <td>
+                <div>
+                    {% for course in courses %}
+                        {% if course.day_of_week == '5' and course.time_slot == '7' %}
+                            <div style="background-color: {{ course.color }};" class="course-name"{{ course.name }}</div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div>
+                    {% for course in courses %}
+                        {% if course.day_of_week == '5' and course.time_slot == '8' %}
+                            <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </td>
+            <td>
+                <div>
+                    {% for course in courses %}
+                        {% if course.day_of_week == '6' and course.time_slot == '7' %}
+                            <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div>
+                    {% for course in courses %}
+                        {% if course.day_of_week == '6' and course.time_slot == '8' %}
+                            <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </td>
+            <td>
+                <div>
+                    {% for course in courses %}
+                        {% if course.day_of_week == '7' and course.time_slot == '7' %}
+                            <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div>
+                    {% for course in courses %}
+                        {% if course.day_of_week == '7' and course.time_slot == '8' %}
+                            <div style="background-color: {{ course.color }};" class="course-name">{{ course.name }}</div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </td>
+        </tr>
+        <!-- 后续逻辑同样处理 -->
+        <!-- ... -->
+    </tbody>
+        </table>
+    
+    <div>
+        <button onclick="changeWeek(-1)">⬅️ 上一周</button>
+        <button onclick="changeWeek(1)">下一周 ➡️</button>
+    </div>
+
+    
+    <!-- 模态窗口 -->
+    <div id="addCourseModal">
+        <div class="modal-content">
+            <span id="closeModal" class="close">&times;</span>
+            <h2>添加课程</h2>
+            <form id="addCourseForm" method="POST" action="{% url 'add_course' %}">
+                {% csrf_token %}
+                <!-- 表单字段将会通过 Django 渲染 -->
+                {{ form.as_p }}
+                <button type="submit">保存</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 删除课程的模态窗口 -->
+    <div id="deleteCourseModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>选择要删除的课程</h2>
+            <form id="deleteCourseForm" action="{% url 'delete_course' %}" method="post">
+                {% csrf_token %}
+                <select name="course_id" required>
+                    <option value="" disabled selected>请选择课程</option>
+                    {% for course in courses %}
+                        <option value="{{ course.id }}">{{ course.name }} - {{ course.time_slot }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-danger">删除课程</button>
+            </form>
+        </div>
+    </div>
+    
+    <!--添加课程的浮窗-->
+    <div id="toast" class="toast">操作成功</div>
+
+<script>
+// 显示浮窗的函数
+function showToast(message) {
+    var toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.className = "toast show";
+    setTimeout(function() {
+        toast.className = toast.className.replace("show", "");
+    }, 3000);
+}
+
+// 提交课程添加表单，显示浮窗提示
+document.getElementById("addCourseForm").onsubmit = function(e) {
+    e.preventDefault();
+    var form = this;
+    var formData = new FormData(form);
+
+    fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            showToast("课程添加成功！");
+            document.getElementById("addCourseModal").style.display = "none";
+            form.reset(); 
+            setTimeout(() => location.reload(), 3000);
+        } else {
+            showToast(data.message || "课程添加失败，请重试！");
+        }
+    })
+    .catch(error => {
+        console.error(error);
+        showToast("网络错误，请稍后再试！");
+    });
+};
+
+// 打开添加课程模态窗口
+document.getElementById("addCourseBtn").addEventListener("click", function() {
+    document.getElementById("addCourseModal").style.display = "block";
+});
+
+// 点击头像按钮跳转到 index.html
+    document.getElementById("avatarBtn").addEventListener("click", function() {
+        window.location.href = "{% url 'information' %}";  // 假设你的 URL 名称为 'index'
+    });
+    
+// 关闭模态窗口的函数
+function closeModal(modal) {
+    modal.style.display = "none";
+}
+
+// 关闭添加课程模态窗口
+document.getElementById("closeModal").addEventListener("click", function() {
+    closeModal(document.getElementById("addCourseModal"));
+});
+
+// 提交删除课程表单，显示浮窗提示
+document.getElementById("deleteCourseForm").onsubmit = function(e) {
+    e.preventDefault();
+    var form = this;
+    var formData = new FormData(form);
+
+    fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            showToast("课程删除成功！");
+            document.getElementById("deleteCourseModal").style.display = "none";
+            setTimeout(() => location.reload(), 3000);
+        } else {
+            showToast(data.message || "课程删除失败，请重试！");
+        }
+    })
+    .catch(error => {
+        console.error(error);
+        showToast("网络错误，请稍后再试！");
+    });
+};
+
+// 打开、关闭删除课程模态窗口
+document.getElementById("deleteCourseBtn").onclick = function() {
+    document.getElementById("deleteCourseModal").style.display = "block";
+}
+
+// 关闭模态窗口的通用逻辑
+document.querySelectorAll(".close").forEach(btn => {
+    btn.addEventListener("click", function() {
+        closeModal(this.closest(".modal"));
+    });
+});
+
+// 点击模态窗口外部关闭模态窗口
+window.addEventListener("click", function(event) {
+    if (event.target == document.getElementById("addCourseModal")) {
+        closeModal(document.getElementById("addCourseModal"));
+    }
+    if (event.target == document.getElementById("deleteCourseModal")) {
+        closeModal(document.getElementById("deleteCourseModal"));
+    }
+});
+
+// 发送请求以更改周数
+    function changeWeek(weekOffset) {
+        fetch(`/change_week/?offset=${weekOffset}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();  // 成功后刷新页面
+                } else {
+                    alert("切换周数失败");
+                }
+            });
+    }
+
+</script>
+
+
 </body>
 </html>

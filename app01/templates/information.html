@@ -1,0 +1,106 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人信息</title>
+    <link href="{% static 'css/information.css' %}" rel="stylesheet">
+</head>
+<body>
+    <video autoplay loop muted class="wallpaper-video" poster="https://files.codelife.cc/itab/defaultWallpaper/videos/56.mp4?x-oss-process=video/snapshot,t_1,f_jpg,w_1366,h_768,m_fast">
+        <source src="https://files.codelife.cc/itab/defaultWallpaper/videos/56.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <div class="container" id="info-container">
+        <h1>个人信息</h1>
+        <div class="profile-card">
+            <div class="info-left">
+                <div class="form-group">
+                    <label for="username">账户名称:</label>
+                    <p id="username">{{ username }}</p>
+                </div>
+                <div class="form-group">
+                    <label for="email">电子邮箱:</label>
+                    <p id="email">{{ email }}</p>
+                </div>
+                <div class="form-group">
+                    <label for="phone">手机号:</label>
+                    <p id="phone">{{ phone_number }}</p>
+                </div>
+                <div class="form-group">
+                    <label for="signature">个性签名:</label>
+                    <p id="signature">{{ signature }}</p>
+                </div>
+            </div>
+            <div class="avatar-section">
+                <img id="avatar" src="{{ avatar }}" alt="头像">  <!-- 显示头像 -->
+            </div>
+        </div>
+
+        <button id="edit-btn" class="btn primary-btn">修改信息</button>
+        <button id="logout-btn" class="btn danger-btn" onclick="logoutUser()">退出登录</button>
+        
+        <form id="edit-form" class="info-form" style="display: none;" method="post" action="{% url 'information' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="profile-card">
+                <div class="info-left">
+                    <div class="form-group">
+                        <label for="edit-username">账户名称</label>
+                        <input type="text" id="edit-username" name="username" value="{{ username }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-email">电子邮箱</label>
+                        <input type="email" id="edit-email" name="email" value="{{ email }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-phone">手机号</label>
+                        <input type="tel" id="edit-phone" name="phone" value="{{ phone_number }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-signature">个性签名</label>
+                        <textarea id="edit-signature" name="signature" rows="3">{{ signature }}</textarea>  <!-- 填充当前的个性签名 -->
+                    </div>
+                </div>
+                <div class="avatar-section">
+                    <label for="avatar-upload">更改头像</label>
+                    <input type="file" id="avatar-upload" name="avatar" accept="image/*"> <!-- 确保有name属性 -->
+                    <img id="avatar-preview" src="{{ avatar }}" alt="头像预览" style="display: none;">
+                </div>
+            </div>
+
+            <!-- 下面的部分为密码修改相关内容 -->
+            <div class="form-group">
+                <label for="current-password">原密码</label>
+                <input type="password" id="current-password" name="current-password" placeholder="输入原密码">
+            </div>
+            <div class="form-group">
+                <label for="new-password">新密码</label>
+                <input type="password" id="new-password" name="new-password" placeholder="输入新密码">
+            </div>
+            <div class="form-group">
+                <label for="confirm-password">确认新密码</label>
+                <input type="password" id="confirm-password" name="confirm-password" placeholder="确认新密码">
+            </div>
+
+            <div id="warningMessage" style="color: red; display: none;"></div> <!-- 新增的警告信息区域 -->
+
+            <button type="submit" class="btn primary-btn">保存更改</button>
+            <button id="cancel-btn" type="button" class="btn secondary-btn">放弃修改</button>
+        </form>
+    </div>
+
+    <!-- 弹窗 -->
+    <div id="info-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <p>个人信息修改完成</p>
+            <button id="close-modal-btn">关闭</button>
+        </div>
+    </div>
+    
+    <script>const loginUrl = "{% url 'login' %}";</script>
+    <script src="{% static 'js/information.js' %}"></script>
+
+</body>
+</html>

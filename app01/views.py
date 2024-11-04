@@ -11,6 +11,11 @@ from app01.forms.userForm import CustomUserCreationForm
 from app01.forms.passwordResetForm import PasswordResetForm
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.decorators import login_required
+from app01.forms.CourseForm import CourseForm
+from app01.models import Course
+from datetime import datetime, timedelta, timezone
+from django.contrib import messages
 
 User = get_user_model()
 
@@ -165,3 +170,174 @@ def home(request):
 
 def index(request):
     return render(request, "index.html")
+
+
+@login_required
+def add_course(request):
+    if request.method == "POST":
+        form = CourseForm(request.POST)
+        if form.is_valid():
+            # 获取数据
+            day_of_week = form.cleaned_data["day_of_week"]
+            time_slot = form.cleaned_data["time_slot"]
+            user = request.user
+
+            # 检查冲突
+            if Course.objects.filter(
+                user=user, day_of_week=day_of_week, time_slot=time_slot
+            ).exists():
+
+                return JsonResponse(
+                    {"status": "error", "message": "该时间段的课程已存在"}
+                )
+
+            # 保存课程
+            course = form.save(commit=False)  # 创建课程实例但不立即保存到数据库
+            course.user = request.user  # 将当前用户设置为课程的用户
+            course.save()  # 保存到数据库
+            return JsonResponse({"status": "success"})
+        else:
+
+            return JsonResponse({"status": "error", "errors": form.errors})
+    else:
+        form = CourseForm()
+
+    return render(request, "add_course.html", {"form": form})
+
+
+@login_required
+def home(request):
+    courses = request.user.courses.all()  # 获取当前用户的课程
+    form = CourseForm()  # 创建一个空的表单
+    print(courses)
+
+    # 获取 session 中的 start_date，如果不存在则初始化为今天的日期
+    start_date_str = request.session.get("start_date")
+    if not start_date_str:
+        # 如果 session 中没有 start_date，初始化为本周的周一
+        today = datetime.today()
+        start_date = today - timedelta(days=today.weekday())  # 获取本周的周一
+        request.session["start_date"] = start_date.strftime(
+            "%Y-%m-%d"
+        )  # 存储到 session
+    else:
+        # 如果 session 中有 start_date，将其转换为 datetime 对象
+        start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
+
+    # 生成日期列表，从周一开始到周日
+    dates = [
+        (start_date + timedelta(days=i)).strftime("%m-%d") for i in range(7)
+    ]
+    days = [
+        "周一",
+        "周二",
+        "周三",
+        "周四",
+        "周五",
+        "周六",
+        "周日",
+    ]  # 定义星期几
+
+    return render(
+        request,
+        "home.html",
+        {"courses": courses, "form": form, "dates": dates, "days": days},
+    )
+
+
+@login_required
+def delete_course(request):
+    if request.method == "POST":
+        course_id = request.POST.get("course_id")  # 获取选择的课程ID
+        try:
+            # 查找当前用户的课程，确保只有该用户的课程可以被删除
+            course = Course.objects.get(id=course_id, user=request.user)
+            course.delete()  # 删除课程
+            return JsonResponse({"status": "success"})  # 返回成功状态
+        except Course.DoesNotExist:
+            return JsonResponse(
+                {"status": "error", "message": "课程不存在"}
+            )  # 返回错误状态
+    return JsonResponse(
+        {"status": "error", "message": "请求方式错误"}
+    )  # 请求方式不正确时的错误响应
+
+
+@login_required
+def change_week(request):
+    if request.method == "GET":
+        # 获取当前存储在 session 中的开始日期
+        start_date_str = request.session.get("start_date", None)
+        if start_date_str:
+            # 将字符串转换为日期对象
+            start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
+        else:
+            # 默认使用当前日期的本周一
+            today = timezone.now()
+            start_date = today - timedelta(days=today.weekday())
+
+        # 获取请求中的偏移量并计算新的开始日期
+        offset = int(request.GET.get("offset", 0))
+        new_start_date = start_date + timedelta(weeks=offset)
+
+        # 更新 session 中的开始日期
+        request.session["start_date"] = new_start_date.strftime("%Y-%m-%d")
+
+        return JsonResponse({"success": True})
+
+    return JsonResponse({"success": False}, status=400)
+
+
+@login_required
+def information(request):
+    user = request.user
+
+    if request.method == "POST":
+        username = request.POST.get("username")
+        email = request.POST.get("email")
+        phone_number = request.POST.get("phone")
+        current_password = request.POST.get("current_password")
+        new_password = request.POST.get("new_password")
+        signature = request.POST.get("signature")
+        # 处理用户信息更新
+        user.username = username
+        user.email = email
+        user.phone_number = phone_number  # 确保该属性存在于用户模型中
+        user.signature = signature  # 更新个性签名
+
+        # 处理头像更新
+        if request.FILES.get("avatar"):
+            user.avatar = request.FILES["avatar"]  # 更新头像
+        # 处理密码更新
+        if current_password and new_password:
+            # 检查原密码是否正确
+            if not user.check_password(current_password):
+                return JsonResponse(
+                    {"error": "原密码错误，请重新输入"}, status=400
+                )
+
+            # 检查新密码是否符合要求
+            if len(new_password) < 6 or len(new_password) > 10:
+                return JsonResponse(
+                    {"error": "新密码长度要求为6-10位"}, status=400
+                )
+
+            # 更新密码
+            user.set_password(new_password)
+            update_session_auth_hash(request, user)  # 保持用户登录状态
+
+        user.save()  # 保存用户信息
+        messages.success(request, "信息修改成功")
+        return JsonResponse({"success": "信息修改成功"})
+
+    context = {
+        "username": user.username,
+        "email": user.email,
+        "phone_number": user.phone_number,
+        "signature": user.signature,  # 个性签名
+        "avatar": (
+            user.avatar.url if user.avatar else "default-avatar.png"
+        ),  # 头像
+    }
+
+    return render(request, "information.html", context)
