@@ -207,6 +207,7 @@ def add_course(request):
 
 @login_required
 def home(request):
+    user = request.user
     courses = request.user.courses.all()  # 获取当前用户的课程
     form = CourseForm()  # 创建一个空的表单
     print(courses)
@@ -237,6 +238,16 @@ def home(request):
         "周六",
         "周日",
     ]  # 定义星期几
+
+    context = {
+        "username": user.username,
+        "email": user.email,
+        "phone_number": user.phone_number,
+        "signature": user.signature,  # 个性签名
+        "avatar": (
+            user.avatar.url if user.avatar else "default-avatar.png"
+        ),  # 头像
+    }
 
     return render(
         request,

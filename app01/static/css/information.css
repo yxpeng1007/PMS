@@ -25,13 +25,19 @@ body {
 .container {
     width: 80%;
     max-width: 900px;
-    background-color: white;
+    background-color: rgba(255, 255, 255, 0.2);
+    /* 白色半透明背景 */
     border-radius: 10px;
     box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
     padding: 30px;
     box-sizing: border-box;
     text-align: center;
-    margin: 30px 10px; /* 默认 margin */
+    margin: 30px 10px;
+    /* 默认 margin */
+    border: 2px solid rgba(173, 216, 230, 0.5);
+    /* 半透明淡蓝色边框 */
+    box-shadow: 0 0 10px rgba(173, 216, 230, 0.5);
+    /* 淡蓝色模糊阴影 */
 }
 
 h1 {

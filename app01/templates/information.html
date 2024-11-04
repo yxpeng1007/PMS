@@ -40,6 +40,7 @@
         </div>
 
         <button id="edit-btn" class="btn primary-btn">修改信息</button>
+        <button id="abandon-btn" class="btn primary-btn" onclick="window.location.href='{% url 'home' %}'">放弃修改</button>
         <button id="logout-btn" class="btn danger-btn" onclick="logoutUser()">退出登录</button>
         
         <form id="edit-form" class="info-form" style="display: none;" method="post" action="{% url 'information' %}" enctype="multipart/form-data">
